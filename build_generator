@@ -6,6 +6,9 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 pushd "${DIR}/Generator"
-rm -rf .build
+if [[ ! -z "$CLEAN" ]]; then
+    rm -rf .build
+fi
+
 env -i PATH="$PATH" HOME="$HOME" xcrun swift build --configuration release "$@"
 popd

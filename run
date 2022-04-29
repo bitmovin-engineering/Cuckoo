@@ -39,7 +39,7 @@ function build_generator {
   else
     if [[ -d "$SCRIPT_PATH/Generator" ]]; then
       echo "Building..."
-      ./build_generator
+      env -i CLEAN="$CLEAN" ./build_generator
       if [[ "$?" -ne 0 ]]; then
         echo "Build seems to have failed for some reason. Please file an issue on GitHub."
         exit 1
@@ -81,6 +81,12 @@ case $1 in
     shift
   ;;
 
+  -b|--build)
+    BUILD=1
+    echo "Building from source."
+    shift
+  ;;
+
   *)
     POSITIONAL+=("$1") # save it in an array for later
     shift
@@ -89,8 +95,7 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-if [[ ! -e "$FILE_PATH" ]] || [[ ! -z "$CLEAN" ]]; then
-  echo "No Cuckoo Generator found."
+if [[ ! -e "$FILE_PATH" ]] || [[ ! -z "$BUILD" ]] || [[ ! -z "$CLEAN" ]]; then
   build_generator "$DOWNLOAD"
 fi
 
