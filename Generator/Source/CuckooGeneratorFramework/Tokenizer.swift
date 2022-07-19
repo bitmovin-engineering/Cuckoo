@@ -1,11 +1,3 @@
-//
-//  Tokenizer.swift
-//  CuckooGenerator
-//
-//  Created by Tadeas Kriz on 12/01/16.
-//  Copyright © 2016 Brightify. All rights reserved.
-//
-
 import Foundation
 import SourceKittenFramework
 
@@ -26,6 +18,11 @@ public struct Tokenizer {
             let structure = try Structure(file: file)
 
             let declarations = tokenize(structure.dictionary[Key.Substructure.rawValue] as? [SourceKitRepresentable] ?? [])
+                .flatMap { declaration -> [Token] in
+                    guard let parent = declaration as? ParentToken else { return [declaration] }
+                    return [parent] + parent.adoptAllYoungerGenerations()
+                }
+
             let imports = tokenize(imports: declarations)
 
             return FileRepresentation(sourceFile: file, declarations: declarations + imports)
@@ -65,7 +62,7 @@ public struct Tokenizer {
         let bodyRange = extractRange(from: dictionary, offset: .BodyOffset, length: .BodyLength)
 
         // Attributes
-        let attributes = (dictionary[Key.Attributes.rawValue] as? [SourceKitRepresentable] ?? [])
+        let attributes = (NSOrderedSet(array: (dictionary[Key.Attributes.rawValue] as? [SourceKitRepresentable] ?? [])
             .compactMap { attribute -> Attribute? in
                 guard let attribute = attribute as? [String: SourceKitRepresentable],
                     let stringKind = attribute[Key.Attribute.rawValue] as? String,
@@ -76,6 +73,7 @@ public struct Tokenizer {
                 guard let text = String(source.utf8[startIndex..<endIndex]) else { return nil }
                 return Attribute(kind: kind, text: text)
             }
+        ).array as? [Attribute]) ?? []
 
         guard !attributes.map({ $0.kind }).contains(.final) else {
             if debugMode {
@@ -112,7 +110,8 @@ public struct Tokenizer {
                 children: children,
                 inheritedTypes: tokenizedInheritedTypes,
                 attributes: attributes,
-                genericParameters: fixedGenericParameters)
+                genericParameters: fixedGenericParameters
+            )
 
         case Kinds.ClassDeclaration.rawValue:
             let subtokens = tokenize(dictionary[Key.Substructure.rawValue] as? [SourceKitRepresentable] ?? [])
@@ -140,10 +139,36 @@ public struct Tokenizer {
                 children: children,
                 inheritedTypes: tokenizedInheritedTypes,
                 attributes: attributes,
-                genericParameters: fixedGenericParameters)
+                genericParameters: fixedGenericParameters
+            )
 
+        case Kinds.StructDeclaration.rawValue:
+            let subtokens = tokenize(dictionary[Key.Substructure.rawValue] as? [SourceKitRepresentable] ?? [])
+            let children = subtokens.only(ContainerToken.self)
+
+            return StructDeclaration(
+                name: name,
+                accessibility: accessibility,
+                range: range!,
+                nameRange: nameRange!,
+                bodyRange: bodyRange!,
+                attributes: attributes,
+                children: children
+            )
+            
         case Kinds.ExtensionDeclaration.rawValue:
-            return ExtensionDeclaration(range: range!)
+            let subtokens = tokenize(dictionary[Key.Substructure.rawValue] as? [SourceKitRepresentable] ?? [])
+            let children = subtokens.only(ContainerToken.self)
+
+            return ExtensionDeclaration(
+                name: name,
+                accessibility: accessibility,
+                range: range!,
+                nameRange: nameRange!,
+                bodyRange: bodyRange!,
+                attributes: attributes,
+                children: children
+            )
 
         case Kinds.InstanceVariable.rawValue:
             let setterAccessibility = (dictionary[Key.SetterAccessibility.rawValue] as? String).flatMap(Accessibility.init)
@@ -167,7 +192,8 @@ public struct Tokenizer {
                 range: range!,
                 nameRange: nameRange!,
                 overriding: false,
-                attributes: attributes)
+                attributes: attributes
+            )
 
         case Kinds.InstanceMethod.rawValue:
             let genericParameters = tokenize(dictionary[Key.Substructure.rawValue] as? [SourceKitRepresentable] ?? []).only(GenericParameter.self)
@@ -191,7 +217,7 @@ public struct Tokenizer {
                 }
             }
 
-            // FIXME: Remove when SourceKitten fixes the off-by-one error that includes the ending `>` in the last inherited type.
+            // FIXME: Remove when SourceKit fixes the off-by-one error that includes the ending `>` in the last inherited type.
             let fixedGenericParameters = fixSourceKittenLastGenericParameterBug(genericParameters)
 
             // When bodyRange != nil, we need to create `ClassMethod` instead of `ProtocolMethod`
@@ -205,7 +231,8 @@ public struct Tokenizer {
                     parameters: namedParameters,
                     bodyRange: bodyRange,
                     attributes: attributes,
-                    genericParameters: fixedGenericParameters)
+                    genericParameters: fixedGenericParameters
+                )
             } else {
                 return ProtocolMethod(
                     name: name,
@@ -215,7 +242,8 @@ public struct Tokenizer {
                     nameRange: nameRange!,
                     parameters: namedParameters,
                     attributes: attributes,
-                    genericParameters: fixedGenericParameters)
+                    genericParameters: fixedGenericParameters
+                )
             }
 
         case Kinds.GenericParameter.rawValue:
@@ -234,7 +262,11 @@ public struct Tokenizer {
             let toIndex = source.index(fromIndex, offsetBy: inheritanceRange.length)
             let inheritance = String(source[fromIndex..<toIndex])
             let fullRange = range.lowerBound..<(range.upperBound + inheritanceMatch.range.length)
-            return GenericParameter(name: name, range: fullRange, inheritedType: InheritanceDeclaration(name: inheritance))
+            return GenericParameter(
+                name: name,
+                range: fullRange,
+                inheritedType: InheritanceDeclaration(name: inheritance)
+            )
 
         default:
             // Do not log anything, until the parser contains all known cases.

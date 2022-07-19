@@ -19,6 +19,10 @@ extension Templates {
 {% for attribute in container.attributes %}
 {{ attribute.text }}
 {% endfor %}
+{% if container.hasParent %}
+extension {{ container.parentFullyQualifiedName }} {
+{% endif %}
+
 {{ container.accessibility }} class {{ container.mockName }}{{ container.genericParameters }}: {{ container.name }}{% if container.isImplementation %}{{ container.genericArguments }}{% endif %}, {% if container.isImplementation %}Cuckoo.ClassMock{% else %}Cuckoo.ProtocolMock{% endif %} {
     {% if container.isGeneric and not container.isImplementation %}
     {{ container.accessibility }} typealias MocksType = \(typeErasureClassName){{ container.genericArguments }}
@@ -117,7 +121,10 @@ extension Templates {
     {% endfor %}
     {{ method.accessibility }}{% if container.isImplementation and method.isOverriding %} override{% endif %} func {{ method.name|escapeReservedKeywords }}{{ method.genericParameters }}({{ method.parameterSignature }}) {{ method.returnSignature }} {
         {{ method.self|openNestedClosure }}
-    return{% if method.isThrowing %} try{% endif %}{% if method.isAsync %} await{% endif %} cuckoo_manager.call{% if method.isThrowing %}{{ method.throwType|capitalize }}{% endif %}("{{method.fullyQualifiedName}}",
+    return{% if method.isThrowing %} try{% endif %}{% if method.isAsync %} await{% endif %} cuckoo_manager.call{% if method.isThrowing %}{{ method.throwType|capitalize }}{% endif %}(
+    \"\"\"
+    {{method.fullyQualifiedName}}
+    \"\"\",
             parameters: ({{method.parameterNames}}),
             escapingParameters: ({{method.escapingParameterNames}}),
             superclassCall:
@@ -141,9 +148,13 @@ extension Templates {
 
 \(Templates.noImplStub)
 
+{% if container.hasParent %}
+}
+{% endif %}
 {% if container.hasUnavailablePlatforms %}
 #endif
 {% endif %}
+
 {% endfor %}
 """
 }
