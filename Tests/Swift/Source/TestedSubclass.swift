@@ -100,6 +100,13 @@ class TestedSubclass: TestedClass, TestedProtocol {
         ) -> Void
     ) {
     }
+
+    @available(iOS 13.0, *)
+    @available(tvOS 13.0, *)
+    @available(macOS 10.15, *)
+    func asyncMethod() async {
+        try? await Task.sleep(nanoseconds: 10)
+    }
 }
 
 class TestedSubSubClass: TestedSubclass {
