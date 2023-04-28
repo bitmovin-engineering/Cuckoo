@@ -27,6 +27,11 @@ class TestedClass {
         return "a"
     }
 
+    var readOnlyPropertyWithJapaneseComment: String {
+        // 日本語コメント
+        return "a"
+    }
+
     @available(iOS 42.0, *)
     var unavailableProperty: UnavailableProtocol? {
         return nil
@@ -52,6 +57,18 @@ class TestedClass {
             : Int
         ) -> String
     ) -> () = { i in }
+
+    var asyncProperty: Int {
+        get async { 0 }
+    }
+
+    var asyncThrowsProperty: Int {
+        get async throws { 0 }
+    }
+
+    var throwsProperty: Int {
+        get throws { 0 }
+    }
 
     func noReturn() {
     }
@@ -109,6 +126,10 @@ class TestedClass {
         return closure("hello")
     }
 
+    func withAutoClosure(action closure: @autoclosure () -> Int) -> Int {
+        return closure()
+    }
+
     func withClosureReturningVoid(_ closure: (String) -> () -> Int) -> Int {
         return closure("hello")()
     }
@@ -142,6 +163,10 @@ class TestedClass {
     }
 
     func withLabelAndUnderscore(labelA a: String, _ b: String) {
+    }
+
+    func withReservedKeywords(for: String, in: String) -> String {
+        "hello"
     }
 
     func callingCountCharactersMethodWithHello() -> Int {

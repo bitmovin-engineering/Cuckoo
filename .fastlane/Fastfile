@@ -33,9 +33,7 @@ platform :mac do
 
   def upload_release release_type
     # Building Cuckoo Generator
-    Dir.chdir '../Generator' do
-      sh '../build_generator'
-    end
+    sh('../build_generator')
 
     # Settings
     binary_name = 'cuckoo_generator'
@@ -100,11 +98,11 @@ platform :mac do
   end
 
   after_all do
-    reset_git_repo
+    reset_git_repo(disregard_gitignore: false)
   end
 
   error do |_, exception|
-    reset_git_repo
+    reset_git_repo(disregard_gitignore: false)
     UI.error "Release failed. This might help: #{exception}"
   end
 end

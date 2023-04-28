@@ -124,6 +124,55 @@ class StubbingTest: XCTestCase {
 
         XCTAssertEqual(mock.protocolMethod(), "a1")
     }
+
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    func testEffectfulProps() async {
+        let mock = MockTestedSubSubClass()
+
+        XCTAssertNotNil(mock)
+
+        stub(mock) { stub in
+            when(stub.asyncProperty.get).thenReturn(5)
+            when(stub.throwsProperty.get).thenReturn(6)
+            when(stub.asyncThrowsProperty.get).thenReturn(7)
+        }
+
+        let resultAsync = await mock.asyncProperty
+        XCTAssertEqual(resultAsync, 5)
+
+        let resultThrows = try! mock.throwsProperty
+        XCTAssertEqual(resultThrows, 6)
+
+        let resultAsyncThrows = try! await mock.asyncThrowsProperty
+        XCTAssertEqual(resultAsyncThrows, 7)
+
+        verify(mock, times(1)).asyncProperty.get()
+        verify(mock, times(1)).throwsProperty.get()
+        verify(mock, times(1)).asyncThrowsProperty.get()
+
+        enum TestError: Error { case fromThrows, fromAsyncThrows }
+
+        stub(mock) { stub in
+            when(stub.throwsProperty.get).thenThrow(TestError.fromThrows)
+            when(stub.asyncThrowsProperty.get).thenThrow(TestError.fromAsyncThrows)
+        }
+
+        var caughtFromThrows = false
+        do {
+            _ = try mock.throwsProperty
+        } catch TestError.fromThrows {
+            caughtFromThrows = true
+        } catch {}
+        XCTAssert(caughtFromThrows)
+
+        var caughtFromAsyncThrows = false
+        do {
+            _ = try await mock.asyncThrowsProperty
+        } catch TestError.fromAsyncThrows {
+            caughtFromAsyncThrows = true
+        } catch {}
+        XCTAssert(caughtFromAsyncThrows)
+    }
     
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func testAsyncMethods() async {
@@ -227,6 +276,7 @@ class StubbingTest: XCTestCase {
                 callNoReturnThrows = true
             }
             when(stub.withClosure(anyClosure())).thenReturn(14)
+            when(stub.withAutoClosure(action: anyClosure())).thenReturn(16)
             when(stub.withEscape(anyString(), action: anyClosure())).then { _ in
                 callWithEscape = true
             }
@@ -289,6 +339,7 @@ class StubbingTest: XCTestCase {
         XCTAssertEqual(mock.withClosure { _ in
             41
         }, 14)
+        XCTAssertEqual(mock.withAutoClosure(action: 42), 16)
         XCTAssertTrue({
             mock.withEscape("a") { _ in }
             return callWithEscape
@@ -337,6 +388,7 @@ class StubbingTest: XCTestCase {
         verify(mock, times(1)).count(characters: anyString())
         verify(mock, times(1)).withNoReturnThrows()
         verify(mock, times(1)).withClosure(anyClosure())
+        verify(mock, times(1)).withAutoClosure(action: anyClosure())
         verify(mock, times(1)).withEscape(anyString(), action: anyClosure())
         verify(mock, times(1)).withOptionalClosure(anyString(), closure: anyClosure())
         verify(mock, times(1)).withLabelAndUnderscore(labelA: anyString(), anyString())

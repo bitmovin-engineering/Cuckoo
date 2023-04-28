@@ -34,6 +34,14 @@ protocol TestedProtocol {
         ) -> String
     ) -> () { get set }
 
+    var throwsProperty: Int { get throws }
+
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    var asyncProperty: Int { get async }
+
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    var asyncThrowsProperty: Int { get async throws }
+
     func noReturn()
 
     func count(characters: String) -> Int
@@ -44,6 +52,8 @@ protocol TestedProtocol {
 
     func withClosure(_ closure: (String) -> Int) -> Int
 
+    func withAutoClosure(action closure: @autoclosure () -> Int) -> Int
+
     func withClosureAndParam(_ a: String, closure:(String) -> Int) -> Int
 
     func withEscape(_ a: String, action closure: @escaping (String) -> Void)
@@ -53,6 +63,14 @@ protocol TestedProtocol {
     func withOptionalClosureAndReturn(_ a: String, closure: ((String) -> Void)?) -> Int
 
     func withLabelAndUnderscore(labelA a: String, _ b: String)
+
+    /// In this example `for` and `in` are not actually used in a way that conflicts with reserved keywords because
+    /// conforming types will typically use `for` and `in` as an argument label for parameter with a different name,
+    /// thus avoiding the usage of a reserved keyword in the body of the function.
+    ///
+    /// The problem was with the generated mock code, which was in turn using these in the body without escaping them,
+    /// causing the generated mock code to fail to compile.
+    func withReservedKeywords(for: String, in: String) -> String
 
     func withNamedTuple(tuple: (a: String, b: String)) -> Int
 
