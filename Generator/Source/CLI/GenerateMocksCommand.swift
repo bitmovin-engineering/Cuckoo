@@ -48,8 +48,13 @@ public struct GenerateMocksCommand: CommandProtocol {
         let headers = parsedFiles.map { options.noHeader ? "" : FileHeaderHandler.getHeader(of: $0, includeTimestamp: !options.noTimestamp) }
         let imports = parsedFiles.map { FileHeaderHandler.getImports(of: $0, testableFrameworks: options.testableFrameworks) }
         let mocks = parsedFiles.map { try! Generator(file: $0).generate(debug: options.debugMode) }
+        let footers = parsedFiles.map {
+            let header = options.noHeader ? "" : FileHeaderHandler.getHeader(of: $0, includeTimestamp: !options.noTimestamp)
 
-        let mergedFiles = zip(zip(headers, imports), mocks).map { $0.0 + $0.1 + $1 }
+            return header.contains("#if") ? "#endif" : ""
+        }
+
+        let mergedFiles = zip(zip(zip(headers, imports), mocks), footers).map { $0.0.0 + $0.0.1 + $0.1 + $1 }
         let outputPath = Path(options.output)
 
         do {
