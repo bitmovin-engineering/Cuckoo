@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -83,7 +83,7 @@
 		325DB0F8F3ED496C016BD4AA /* StderrPrint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StderrPrint.swift; sourceTree = "<group>"; };
 		32A46C7AA3384C6A9E75D42D /* Kinds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kinds.swift; sourceTree = "<group>"; };
 		33988C480FC9AC5C149B6795 /* StructDeclaration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StructDeclaration.swift; sourceTree = "<group>"; };
-		33C94522C577C12EB8DB7D1D /* cuckoo_generator */ = {isa = PBXFileReference; includeInIndex = 0; path = cuckoo_generator; sourceTree = BUILT_PRODUCTS_DIR; };
+		33C94522C577C12EB8DB7D1D /* cuckoo_generator */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = text; path = cuckoo_generator; sourceTree = BUILT_PRODUCTS_DIR; };
 		349E81B36644C4CD480B8DBA /* CuckooGenerator-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CuckooGenerator-Info.plist"; sourceTree = "<group>"; };
 		433E7849C8D247BB09016EA7 /* ClassMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassMethod.swift; sourceTree = "<group>"; };
 		4C7E190BA225F53914F522B2 /* TypeErasureTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeErasureTemplate.swift; sourceTree = "<group>"; };
@@ -302,8 +302,6 @@
 		F2651F151B1E7A48BD28E107 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 7EAFB2B59860D61E8F4A757F /* Build configuration list for PBXProject "Generator" */;
 			compatibilityVersion = "Xcode 13.0";
@@ -590,8 +588,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jpsim/SourceKitten.git";
 			requirement = {
-				kind = upToNextMinorVersion;
-				minimumVersion = 0.21.2;
+				kind = exactVersion;
+				version = 0.36.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
