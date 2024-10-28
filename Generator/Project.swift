@@ -6,7 +6,7 @@ let project = Project(
     name: "Generator",
     options: .options(automaticSchemesOptions: .disabled, disableSynthesizedResourceAccessors: true),
     packages: [
-        .package(url: "https://github.com/jpsim/SourceKitten.git", .upToNextMinor(from: "0.21.2")),
+        .package(url: "https://github.com/jpsim/SourceKitten.git", .upToNextMinor(from: "0.36.0")),
         .package(url: "https://github.com/nvzqz/FileKit.git", .branch("develop")),
         .package(url: "https://github.com/kylef/Stencil.git", .exact("0.14.2")),
         .package(url: "https://github.com/Carthage/Commandant.git", .exact("0.15.0")),
