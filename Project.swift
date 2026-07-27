@@ -57,6 +57,7 @@ func platformSet(platform: PlatformType) -> (targets: [Target], schemes: [Scheme
                 \([
                     #""$PROJECT_DIR"/Generator/bin/cuckoo_generator generate"#,
                     "--testable Cuckoo",
+                    "--spi-import Cuckoo:ExperimentalApi",
                     "--exclude ExcludedTestClass,ExcludedProtocol",
                     #"--output "$PROJECT_DIR"/Tests/Swift/Generated/GeneratedMocks.swift"#,
                     #"--glob "$PROJECT_DIR"/Tests/Swift/Source/*.swift"#,

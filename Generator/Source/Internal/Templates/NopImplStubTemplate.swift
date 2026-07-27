@@ -27,6 +27,9 @@ extension Templates {
 
     {% for initializer in container.initializers %}
     {{ initializer.unavailablePlatformsCheck }}
+    {% for attribute in initializer.attributes %}
+    {{ attribute.text }}
+    {% endfor %}
     {{ initializer.accessibility }}{% if container.@type == "ClassDeclaration" %} override{% endif %}{% if initializer.@type == "ProtocolMethod" %} required{%endif%} init({{initializer.parameterSignature}}) {
         {% if container.@type == "ClassDeclaration" %}
         super.init({{initializer.call}})

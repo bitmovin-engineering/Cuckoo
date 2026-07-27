@@ -15,12 +15,18 @@ public struct FileHeaderHandler {
         return generationInfo + "\n" + header + "\n"
     }
 
-    public static func getImports(of file: FileRepresentation, testableFrameworks: [String]) -> String {
+    public static func getImports(
+        of file: FileRepresentation,
+        testableFrameworks: [String],
+        spiImports: [String]
+    ) -> String {
         var imports = Array(Set(file.declarations.only(Import.self).map { "import \($0.importee)\n" })).sorted().joined(separator: "")
         if imports.isEmpty == false {
             imports = "\n\(imports)"
         }
-        return "import Cuckoo\n" + getTestableImports(testableFrameworks: testableFrameworks) + imports
+        return "import Cuckoo\n"
+            + getConfiguredImports(testableFrameworks: testableFrameworks, spiImports: spiImports)
+            + imports
     }
 
     private static func getRelativePath(from absolutePath: String) -> String {
@@ -74,7 +80,10 @@ public struct FileHeaderHandler {
         }
     }
 
-    private static func getTestableImports(testableFrameworks: [String]) -> String {
+    private static func getConfiguredImports(
+        testableFrameworks: [String],
+        spiImports: [String]
+    ) -> String {
         func replaceIllegalCharacters(_ char: UnicodeScalar) -> Character {
             if CharacterSet.letters.contains(UnicodeScalar(char.value)!) || CharacterSet.decimalDigits.contains(UnicodeScalar(char.value)!) {
                 return Character(char)
@@ -82,6 +91,32 @@ public struct FileHeaderHandler {
                 return "_"
             }
         }
-        return testableFrameworks.map { String($0.unicodeScalars.map(replaceIllegalCharacters)) }.map { "@testable import \($0)\n" }.joined(separator: "")
+
+        let spiImportsByModule = Dictionary(grouping: spiImports.compactMap(resolveSPIImport)) { $0.module }
+        let testableModules = Set(testableFrameworks)
+        let spiOnlyModules = spiImportsByModule.keys
+            .filter { !testableModules.contains($0) }
+            .sorted()
+
+        return (testableFrameworks + spiOnlyModules).map { module in
+            let spiAttributes = spiImportsByModule[module, default: []]
+                .map { String($0.spi.unicodeScalars.map(replaceIllegalCharacters)) }
+                .map { "@_spi(\($0))" }
+            let testableAttribute = testableModules.contains(module) ? ["@testable"] : []
+            let importAttributes = (spiAttributes + testableAttribute).joined(separator: " ")
+            let moduleName = String(module.unicodeScalars.map(replaceIllegalCharacters))
+            return "\(importAttributes) import \(moduleName)\n"
+        }.joined(separator: "")
+    }
+
+    private static func resolveSPIImport(_ spiImport: String) -> (module: String, spi: String)? {
+        let components = spiImport.split(separator: ":", maxSplits: 1, omittingEmptySubsequences: false)
+        guard components.count == 2 else { return nil }
+
+        let module = String(components[0]).trimmingCharacters(in: .whitespacesAndNewlines)
+        let spi = String(components[1]).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !module.isEmpty, !spi.isEmpty else { return nil }
+
+        return (module: module, spi: spi)
     }
 }

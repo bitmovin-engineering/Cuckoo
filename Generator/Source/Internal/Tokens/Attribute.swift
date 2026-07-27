@@ -13,6 +13,7 @@ public struct Attribute: Hashable {
         case ibOutlet = "source.decl.attribute.iboutlet"
         case available = "source.decl.attribute.available"
         case final = "source.decl.attribute.final"
+        case spi = "source.decl.attribute._spi"
     }
 
     public var kind: Kind
@@ -22,9 +23,13 @@ public struct Attribute: Hashable {
         switch (kind) {
         case .objc, .optional, .lazy, .required, .override, .convenience, .weak, .ibAction, .ibOutlet, .final:
             return false
-        case .available:
+        case .available, .spi:
             return true
         }
+    }
+
+    public var isSupportedOnGeneratedProxy: Bool {
+        return isSupported && kind != .spi
     }
 
     public var unavailablePlatform: String? {

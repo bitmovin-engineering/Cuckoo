@@ -4,12 +4,12 @@ import Result
 import SourceKittenFramework
 import FileKit
 
-private func curry<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, R>
-    (_ f: @escaping (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12) -> R)
-    -> (P1) -> (P2) -> (P3) -> (P4) -> (P5) -> (P6) -> (P7) -> (P8) -> (P9) -> (P10) -> (P11) -> (P12) -> R {
-        return { p1 in { p2 in { p3 in { p4 in { p5 in { p6 in { p7 in { p8 in { p9 in { p10 in { p11 in { p12 in
-            f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12)
-        } } } } } } } } } } } }
+private func curry<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, R>
+    (_ f: @escaping (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13) -> R)
+    -> (P1) -> (P2) -> (P3) -> (P4) -> (P5) -> (P6) -> (P7) -> (P8) -> (P9) -> (P10) -> (P11) -> (P12) -> (P13) -> R {
+        return { p1 in { p2 in { p3 in { p4 in { p5 in { p6 in { p7 in { p8 in { p9 in { p10 in { p11 in { p12 in { p13 in
+            f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13)
+        } } } } } } } } } } } } }
 }
 
 public struct GenerateMocksCommand: CommandProtocol {
@@ -46,7 +46,13 @@ public struct GenerateMocksCommand: CommandProtocol {
 
         // generating headers and mocks
         let headers = parsedFiles.map { options.noHeader ? "" : FileHeaderHandler.getHeader(of: $0, includeTimestamp: !options.noTimestamp) }
-        let imports = parsedFiles.map { FileHeaderHandler.getImports(of: $0, testableFrameworks: options.testableFrameworks) }
+        let imports = parsedFiles.map {
+            FileHeaderHandler.getImports(
+                of: $0,
+                testableFrameworks: options.testableFrameworks,
+                spiImports: options.spiImports
+            )
+        }
         let mocks = parsedFiles.map { try! Generator(file: $0).generate(debug: options.debugMode) }
 
         let mergedFiles = zip(zip(headers, imports), mocks).map { $0.0 + $0.1 + $1 }
@@ -163,6 +169,7 @@ public struct GenerateMocksCommand: CommandProtocol {
         let noTimestamp: Bool
         let noInheritance: Bool
         let testableFrameworks: [String]
+        let spiImports: [String]
         let exclude: [String]
         let filePrefix: String
         let noClassMocking: Bool
@@ -173,6 +180,7 @@ public struct GenerateMocksCommand: CommandProtocol {
         public init(
             output: String,
             testableFrameworks: String,
+            spiImports: String,
             exclude: String,
             noHeader: Bool,
             noTimestamp: Bool,
@@ -186,6 +194,7 @@ public struct GenerateMocksCommand: CommandProtocol {
         ) {
             self.output = output
             self.testableFrameworks = testableFrameworks.components(separatedBy: ",").filter { !$0.isEmpty }
+            self.spiImports = spiImports.components(separatedBy: ",").filter { !$0.isEmpty }
             self.exclude = exclude.components(separatedBy: ",").filter { !$0.isEmpty }.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             self.noHeader = noHeader
             self.noTimestamp = noTimestamp
@@ -203,6 +212,8 @@ public struct GenerateMocksCommand: CommandProtocol {
             let output: Result<String, CommandantError<ClientError>> = m <| Option(key: "output", defaultValue: "GeneratedMocks.swift", usage: "Where to put the generated mocks.\nIf a path to a directory is supplied, each input file will have a respective output file with mocks.\nIf a path to a Swift file is supplied, all mocks will be in a single file.\nDefault value is `GeneratedMocks.swift`.")
 
             let testable: Result<String, CommandantError<ClientError>> = m <| Option(key: "testable", defaultValue: "", usage: "A comma separated list of frameworks that should be imported as @testable in the mock files.")
+
+            let spiImports: Result<String, CommandantError<ClientError>> = m <| Option(key: "spi-import", defaultValue: "", usage: "A comma separated list of module:SPI pairs. Each module is imported with access to the corresponding SPI.")
 
             let exclude: Result<String, CommandantError<ClientError>> = m <| Option(key: "exclude", defaultValue: "", usage: "A comma separated list of classes and protocols that should be skipped during mock generation.")
 
@@ -227,6 +238,7 @@ public struct GenerateMocksCommand: CommandProtocol {
             return curry(Options.init)
                 <*> output
                 <*> testable
+                <*> spiImports
                 <*> exclude
                 <*> noHeader
                 <*> noTimestamp

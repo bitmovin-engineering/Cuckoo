@@ -44,6 +44,7 @@ public struct InstanceVariable: Token, HasAccessibility, HasAttributes {
             "stubType": (overriding ? "Class" : "Protocol") + "ToBeStubbed\(readOnlyStubString)\(optionalString)\(throwingString)Property",
             "verifyType": "Verify\(readOnlyVerifyString)\(optionalString)Property",
             "attributes": attributes.filter { $0.isSupported },
+            "attributesForGeneratedProxy": attributes.filter { $0.isSupportedOnGeneratedProxy },
             "hasUnavailablePlatforms": hasUnavailablePlatforms,
             "unavailablePlatformsCheck": unavailablePlatformsCheck,
         ]

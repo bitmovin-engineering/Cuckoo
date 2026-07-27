@@ -7,6 +7,9 @@ extension Templates {
 
         {% for property in container.properties %}private let _getter_storage$${{ property.name }}: () -> {{ property.type }}{% if not property.isReadOnly %}
         private let _setter_storage$${{ property.name }}: ({{ property.type }}) -> Void{% endif %}
+        {% for attribute in property.attributes %}
+        {{ attribute.text }}
+        {% endfor %}
         {{ container.accessibility }} var {{ property.name }}: {{ property.type }} {
             get { return _getter_storage$${{ property.name }}() }{% if not property.isReadOnly %}
             set { _setter_storage$${{ property.name }}(newValue) }{% endif %}
@@ -26,13 +29,19 @@ extension Templates {
         }
         {% if container.initializers %}
         /// MARK:- ignored required initializers{% endif %}
-        {% for initializer in container.initializers %}{{ container.accessibility }} required init({{ initializer.parameterSignature }}) {
+        {% for initializer in container.initializers %}{% for attribute in initializer.attributes %}
+        {{ attribute.text }}
+        {% endfor %}
+        {{ container.accessibility }} required init({{ initializer.parameterSignature }}) {
             fatalError("`DefaultImplCaller` class is only used for calling default implementation and can't be initialized on its own.")
         }
         {% endfor %}
 
         {% for method in container.methods %}
         private let _storage${{ forloop.counter }}${{ method.name }}: ({{ method.inputTypes }}) {% if method.isAsync %} async{% endif %} -> {{ method.returnType }}
+        {% for attribute in method.attributes %}
+        {{ attribute.text }}
+        {% endfor %}
         {{ container.accessibility }} func {{ method.name|escapeReservedKeywords }}({{ method.parameterSignature }}) {{ method.returnSignature }} {
             return {% if method.isAsync %} await{% endif %} _storage${{ forloop.counter }}${{ method.name }}({{ method.parameterNames }})
         }

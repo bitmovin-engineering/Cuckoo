@@ -44,6 +44,7 @@ let project = Project(
                         // Any changes here should be reflected in `../Project.swift` as well.
                         LaunchArgument(name: "generate", isEnabled: true),
                         LaunchArgument(name: "--testable Cuckoo", isEnabled: true),
+                        LaunchArgument(name: "--spi-import Cuckoo:ExperimentalApi", isEnabled: true),
                         LaunchArgument(name: "--exclude ExcludedTestClass,ExcludedProtocol", isEnabled: true),
                         LaunchArgument(name: #"--output "$PROJECT_DIR"/GeneratedMocks.swift"#, isEnabled: true),
                         // This is the input file(s) glob.

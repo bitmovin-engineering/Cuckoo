@@ -129,6 +129,7 @@ public extension Method {
             "hasClosureParams": hasClosureParams,
             "hasOptionalParams": hasOptionalParams,
             "attributes": attributes.filter { $0.isSupported },
+            "attributesForGeneratedProxy": attributes.filter { $0.isSupportedOnGeneratedProxy },
             "hasUnavailablePlatforms": hasUnavailablePlatforms,
             "unavailablePlatformsCheck": unavailablePlatformsCheck,
             "genericParameters": isGeneric ? "<\(genericParametersString)>" : "",

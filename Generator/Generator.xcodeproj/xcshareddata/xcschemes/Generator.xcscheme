@@ -80,6 +80,10 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "--spi-import Cuckoo:ExperimentalApi"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "--exclude ExcludedTestClass,ExcludedProtocol"
             isEnabled = "YES">
          </CommandLineArgument>
