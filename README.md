@@ -495,6 +495,9 @@ The default value is `GeneratedMocks.swift`.
 ###### `--testable` (string)[,(string)...]
 A comma separated list of frameworks that should be imported as @testable in the mock files.
 
+###### `--spi-import` (module:SPI)[,(module:SPI)...]
+A comma separated list of module and SPI pairs. Each module is imported with access to the corresponding SPI. If the same module is also passed to `--testable`, the generated import contains both attributes.
+
 ###### `--exclude` (string)[,(string)...]
 A comma separated list of classes and protocols that should be skipped during mock generation.
 

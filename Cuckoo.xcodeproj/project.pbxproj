@@ -1864,7 +1864,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"$GENERATE_TEST_MOCKS\" = \"NO\" ] ; then exit; fi\n\n# Make sure the generator is up-to-date.\necho 'Building generator.'\n\"$PROJECT_DIR\"/build_generator\n\necho 'Generating mocks.'\n\"$PROJECT_DIR\"/Generator/bin/cuckoo_generator generate \\\n\t--testable Cuckoo \\\n\t--exclude ExcludedTestClass,ExcludedProtocol \\\n\t--output \"$PROJECT_DIR\"/Tests/Swift/Generated/GeneratedMocks.swift \\\n\t--glob \"$PROJECT_DIR\"/Tests/Swift/Source/*.swift";
+			shellScript = "if [ \"$GENERATE_TEST_MOCKS\" = \"NO\" ] ; then exit; fi\n\n# Make sure the generator is up-to-date.\necho 'Building generator.'\n\"$PROJECT_DIR\"/build_generator\n\necho 'Generating mocks.'\n\"$PROJECT_DIR\"/Generator/bin/cuckoo_generator generate \\\n\t--testable Cuckoo \\\n\t--spi-import Cuckoo:ExperimentalApi \\\n\t--exclude ExcludedTestClass,ExcludedProtocol \\\n\t--output \"$PROJECT_DIR\"/Tests/Swift/Generated/GeneratedMocks.swift \\\n\t--glob \"$PROJECT_DIR\"/Tests/Swift/Source/*.swift";
 		};
 		4D36DA407A6B4E6EFDC6DA5F /* Generate mocks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1883,7 +1883,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"$GENERATE_TEST_MOCKS\" = \"NO\" ] ; then exit; fi\n\n# Make sure the generator is up-to-date.\necho 'Building generator.'\n\"$PROJECT_DIR\"/build_generator\n\necho 'Generating mocks.'\n\"$PROJECT_DIR\"/Generator/bin/cuckoo_generator generate \\\n\t--testable Cuckoo \\\n\t--exclude ExcludedTestClass,ExcludedProtocol \\\n\t--output \"$PROJECT_DIR\"/Tests/Swift/Generated/GeneratedMocks.swift \\\n\t--glob \"$PROJECT_DIR\"/Tests/Swift/Source/*.swift";
+			shellScript = "if [ \"$GENERATE_TEST_MOCKS\" = \"NO\" ] ; then exit; fi\n\n# Make sure the generator is up-to-date.\necho 'Building generator.'\n\"$PROJECT_DIR\"/build_generator\n\necho 'Generating mocks.'\n\"$PROJECT_DIR\"/Generator/bin/cuckoo_generator generate \\\n\t--testable Cuckoo \\\n\t--spi-import Cuckoo:ExperimentalApi \\\n\t--exclude ExcludedTestClass,ExcludedProtocol \\\n\t--output \"$PROJECT_DIR\"/Tests/Swift/Generated/GeneratedMocks.swift \\\n\t--glob \"$PROJECT_DIR\"/Tests/Swift/Source/*.swift";
 		};
 		8A9104459A6B850D7776ED8F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1946,7 +1946,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"$GENERATE_TEST_MOCKS\" = \"NO\" ] ; then exit; fi\n\n# Make sure the generator is up-to-date.\necho 'Building generator.'\n\"$PROJECT_DIR\"/build_generator\n\necho 'Generating mocks.'\n\"$PROJECT_DIR\"/Generator/bin/cuckoo_generator generate \\\n\t--testable Cuckoo \\\n\t--exclude ExcludedTestClass,ExcludedProtocol \\\n\t--output \"$PROJECT_DIR\"/Tests/Swift/Generated/GeneratedMocks.swift \\\n\t--glob \"$PROJECT_DIR\"/Tests/Swift/Source/*.swift";
+			shellScript = "if [ \"$GENERATE_TEST_MOCKS\" = \"NO\" ] ; then exit; fi\n\n# Make sure the generator is up-to-date.\necho 'Building generator.'\n\"$PROJECT_DIR\"/build_generator\n\necho 'Generating mocks.'\n\"$PROJECT_DIR\"/Generator/bin/cuckoo_generator generate \\\n\t--testable Cuckoo \\\n\t--spi-import Cuckoo:ExperimentalApi \\\n\t--exclude ExcludedTestClass,ExcludedProtocol \\\n\t--output \"$PROJECT_DIR\"/Tests/Swift/Generated/GeneratedMocks.swift \\\n\t--glob \"$PROJECT_DIR\"/Tests/Swift/Source/*.swift";
 		};
 		A0387264E33090A9E7C05906 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

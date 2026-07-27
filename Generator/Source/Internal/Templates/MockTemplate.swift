@@ -94,6 +94,9 @@ extension {{ container.parentFullyQualifiedName }} {
     {% if debug %}
     // {{initializer}}
     {% endif %}
+    {% for attribute in initializer.attributes %}
+    {{ attribute.text }}
+    {% endfor %}
     {{ initializer.accessibility }}{% if container.isImplementation %} override{% endif %}{% if initializer.@type == "ProtocolMethod" %} required{% endif %} init({{initializer.parameterSignature}}) {
         {% if container.isImplementation %}
         super.init({{initializer.call}})

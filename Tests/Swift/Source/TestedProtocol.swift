@@ -150,3 +150,17 @@ public protocol PublicoProtocolo {
 
     func internalMethod()
 }
+
+@_spi(ExperimentalApi)
+public final class SPIValue {}
+
+public protocol SPIProtocol {
+    @_spi(ExperimentalApi)
+    var spiValue: SPIValue? { get }
+
+    @_spi(ExperimentalApi)
+    init(spiValue: SPIValue?)
+
+    @_spi(ExperimentalApi)
+    func update(spiValue: SPIValue?)
+}
